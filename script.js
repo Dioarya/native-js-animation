@@ -3,8 +3,8 @@
 const canvas = document.getElementById("canvas");
 let cols = 1;
 let rows = 1;
-let w = Math.max(window.screen.width / 10, window.screen.height / 10, 100);
-let h = Math.max(window.screen.width / 10, window.screen.height / 10, 100);
+let w = 100;
+let h = 100;
 let width;
 let height;
 
@@ -24,7 +24,6 @@ if (getQueryVariable("o") == "a" || ((getQueryVariable("o") != "a" && getQueryVa
 
 let animationStyles = 3;
 let animationStyle = Math.floor(Math.random() * 100) % animationStyles;
-animationStyle = 2;
 let animationStartTime = 2;
 let backgroundImage;
 let backgroundVideo;
@@ -86,7 +85,17 @@ function draw() {
             backgroundVideo.play()
             ctx.drawImage(backgroundVideo, 0, 0, width, height);
         }
-    } else ctx.drawImage(backgroundImage, 0, 0, width, height);
+    } else if ((getTime() - animationStartTime) / totalAnimationTime > 1 / 2 + holdRatio / 2 + 0.5) {
+        let source = film;
+        if (movie.moviePlay) {
+            source = movie;
+        }
+        source.width = 1920
+        source.height = 1080
+        ctx.drawImage(source, 0, 0, 1920, 1080, 0, 0, width, height);
+    } else {
+        ctx.drawImage(backgroundImage, 0, 0, width, height);
+    }
     for (let piece of pieces) piece.show();
 
 }
@@ -217,7 +226,10 @@ class Piece {
     }
     async drawImage(image, t) {
         let newImage = image;
-        if (image instanceof Function) newImage = await image();
+        if (image instanceof Function)
+            if ((getTime() - animationStartTime) / totalAnimationTime < 1 / 2 + holdRatio / 2 + 0.5) newImage = await image();
+            else return;
+
 
         if (t === undefined) {
             ctx.drawImage(newImage.source, newImage.x * newImage.source.width / cols, newImage.y * newImage.source.height / rows, newImage.source.width / cols, newImage.source.height / rows, this.x, this.y, this.w, this.h);
@@ -234,6 +246,7 @@ class Piece {
 
             case 1:
                 ctx.drawImage(newImage.source, newImage.x * newImage.source.width / cols, newImage.y * newImage.source.height / rows, newImage.source.width / cols, newImage.source.height / rows, this.x + t * this.w / 2, this.y + t * this.h / 2, (1 - t) * this.w, (1 - t) * this.h);
+                ctx.resetTransform();
                 break;
 
             case 2:
@@ -257,7 +270,7 @@ class Piece {
             case 1:
             case 2:
                 if (getTime() < animationStartTime + offset) this.drawImage(this.image1);
-                else if (getTime() > animationStartTime + offset + totalAnimationTime) this.drawImage(this.image2);
+                else if (getTime() > animationStartTime + offset + totalAnimationTime) this.drawImage(this.image2)
                 else {
                     let rel_t = (getTime() - animationStartTime - offset) / totalAnimationTime;
                     if (rel_t < 1 / 2 - holdRatio / 2) { this.drawImage(this.image1, remap(rel_t, 0, 1 / 2 - holdRatio / 2, 0, 1)); }
