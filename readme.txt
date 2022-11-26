@@ -1,0 +1,1 @@
+open the "index.html" file inside the browser to see the animation, after the animation is done, refresh to possibly (randomized) get a new picture.
