@@ -13,29 +13,31 @@ let images2 = [];
 let endImagePaths = ['end1.jpg', 'end2.jpg'];
 let videoEnding;
 let endImagePath;
-if (getQueryVariable("o") == "a" || (getQueryVariable("o") == "r" && Math.random() < 0.5)) {
+console.log(getQueryVariable("o"));
+if (getQueryVariable("o") == "a" || ((getQueryVariable("o") != "a" && getQueryVariable("o") != "b") && Math.random() < 0.5)) {
     endImagePath = endImagePaths[0];
     videoEnding = true;
-} else if (getQueryVariable("o") == "b" || getQueryVariable("o") == "r") {
+} else if (getQueryVariable("o") == "b" || (getQueryVariable("o") != "a" && getQueryVariable("o") != "b")) {
     endImagePath = endImagePaths[1];
     videoEnding = false;
 }
 
 let animationStyles = 3;
-// let animationStyle = Math.floor(Math.random() * 100) % animationStyles;
+let animationStyle = Math.floor(Math.random() * 100) % animationStyles;
+animationStyle = 2;
 let animationStartTime = 2;
-let animationStyle = 0;
 let backgroundImage;
 let backgroundVideo;
 let audio, sound, film, movie;
 let pieces;
 let resizing = true;
 let framecount = 0;
+
+let t;
 let animationTime = 0.25;
 let holdTime = 1;
 let totalAnimationTime = animationTime + holdTime;
 let holdRatio = holdTime / totalAnimationTime;
-let t;
 
 
 /** @type {CanvasRenderingContext2D} */
@@ -226,13 +228,12 @@ class Piece {
             case 0:
                 ctx.translate(this.x, this.y);
                 ctx.transform(1, t, t, 1, -t * this.w / 2, -t * this.h / 2);
-                // console.log(newImage.source, newImage.x * newImage.source.width / cols, newImage.y * newImage.source.height / rows, newImage.source.width / cols, newImage.source.height / rows, 0, 0, this.w, this.h)
                 ctx.drawImage(newImage.source, newImage.x * newImage.source.width / cols, newImage.y * newImage.source.height / rows, newImage.source.width / cols, newImage.source.height / rows, 0, 0, this.w, this.h);
                 ctx.resetTransform();
                 break;
 
             case 1:
-                ctx.drawImage(newImage.source, newImage.x, newImage.y, newImage.w, newImage.h, this.x + t * this.w / 2, this.y + t * this.h / 2, (1 - t) * this.w, (1 - t) * this.h);
+                ctx.drawImage(newImage.source, newImage.x * newImage.source.width / cols, newImage.y * newImage.source.height / rows, newImage.source.width / cols, newImage.source.height / rows, this.x + t * this.w / 2, this.y + t * this.h / 2, (1 - t) * this.w, (1 - t) * this.h);
                 break;
 
             case 2:
@@ -240,10 +241,8 @@ class Piece {
                 ctx.translate(this.x + this.w / 2, this.y + this.h / 2);
                 ctx.scale(1 - t, 1 - t)
                 ctx.rotate(2 * Math.PI * t);
-                ctx.drawImage(newImage.source, newImage.x, newImage.y, newImage.w, newImage.h, -this.w / 2, -this.h / 2, this.w, this.h);
-                ctx.rotate(-2 * Math.PI * t);
-                ctx.scale(1 / (1 - t), 1 / (1 - t))
-                ctx.translate(-(this.x + this.w / 2), -(this.y + this.h / 2));
+                ctx.drawImage(newImage.source, newImage.x * newImage.source.width / cols, newImage.y * newImage.source.height / rows, newImage.source.width / cols, newImage.source.height / rows, -this.w / 2, -this.h / 2, this.w, this.h);
+                ctx.resetTransform();
                 ctx.globalAlpha = 1;
                 break;
 
@@ -348,5 +347,6 @@ function getQueryVariable(variable) {
             return decodeURIComponent(pair[1]);
         }
     }
-    console.log('Query variable %s not found', variable);
+    return undefined;
+    // console.log('Query variable %s not found', variable);
 }
