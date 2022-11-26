@@ -3,8 +3,8 @@
 const canvas = document.getElementById("canvas");
 let cols = 1;
 let rows = 1;
-let w = Math.max(window.screen.width / 25, window.screen.height / 25);
-let h = Math.max(window.screen.width / 25, window.screen.height / 25);
+let w = 100;
+let h = 100;
 let width;
 let height;
 
